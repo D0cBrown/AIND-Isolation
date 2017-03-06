@@ -8,6 +8,7 @@ relative strength using tournament.py and include the results in your report.
 """
 import random
 import sys
+import math
 
 class Timeout(Exception):
     """Subclass base exception for code clarity."""
@@ -45,7 +46,22 @@ def custom_score(game, player):
 
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves - opp_moves)
+    #if opp_moves == 0:
+    #   opp_moves=1
+    blank_spaces = len(game.get_blank_spaces())
+
+    #Heuristic 1
+    #return float(own_moves - opp_moves)
+
+    # Heuristic 2
+    #return float(own_moves - 2*opp_moves)
+    # Heuristic 3
+    #return ((own_moves)/opp_moves)
+
+    # Heuristic 4
+    return (math.exp((own_moves) - opp_moves))
+
+
     #raise NotImplementedError
 
 
