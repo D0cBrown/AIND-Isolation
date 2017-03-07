@@ -46,8 +46,8 @@ def custom_score(game, player):
 
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    #if opp_moves == 0:
-    #   opp_moves=1
+    if opp_moves == 0:
+        opp_moves=1
     blank_spaces = len(game.get_blank_spaces())
 
     #Heuristic 1
@@ -56,10 +56,10 @@ def custom_score(game, player):
     # Heuristic 2
     #return float(own_moves - 2*opp_moves)
     # Heuristic 3
-    #return ((own_moves)/opp_moves)
+    return ((own_moves)/opp_moves)
 
     # Heuristic 4
-    return (math.exp((own_moves) - opp_moves))
+   # return (math.exp((own_moves) - opp_moves))
 
 
     #raise NotImplementedError
