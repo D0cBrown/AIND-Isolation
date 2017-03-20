@@ -7,12 +7,94 @@ You must test your agent's strength against a set of agents with known
 relative strength using tournament.py and include the results in your report.
 """
 import random
-import sys
 import math
 
 class Timeout(Exception):
     """Subclass base exception for code clarity."""
     pass
+
+def heuristic_1(game, player):
+    # This heuristic expand the legal moves to one level further
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+
+    return((own_moves) / (1+opp_moves))
+
+
+
+def heuristic_2(game, player):
+    # This heuristic tries to stick to the center of the board while pushing
+    # the opponent away from the center
+
+    opp = game.get_opponent(player)
+
+    player_location = game.get_player_location(player)
+    opp_location = game.get_player_location(opp)
+
+    centerwidth = game.width/2
+    centerheight = game.height/2
+    player_distance_to_center = math.sqrt(((player_location[0] - centerwidth) ** 2 + (player_location[1] - centerheight) ** 2))
+    opp_distance_to_center = math.sqrt(((opp_location[0] - centerwidth) ** 2 + (opp_location[1] - centerheight) ** 2))
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(opp))
+    return own_moves - player_distance_to_center - opp_moves + opp_distance_to_center
+
+def heuristic_4(game, player):
+    """
+    own_moves = game.get_legal_moves(player)
+    own_moves_num = len(own_moves)
+    for move in own_moves:
+        own_moves_num += len(game.forecast_move(move).get_legal_moves(player))
+
+    opp = game.get_opponent(player)
+    opp_moves = game.get_legal_moves()
+    opp_moves_num = len(opp_moves)
+    for move in opp_moves:
+        opp_moves_num += len(game.forecast_move(move).get_legal_moves(opp))
+
+    return float(own_moves_num - opp_moves_num)
+
+    :param game:
+    :param player:
+    :return:
+    """
+
+
+    # This heuristic tries to stick to the center of the board while pushing
+    # the opponent away from the center
+    opponent = game.get_opponent(player)
+
+    player_moves = game.get_legal_moves(player)
+    num_player_moves = len(player_moves)
+
+    opponent_moves = game.get_legal_moves(opponent)
+    num_opponent_moves = len(opponent_moves)
+   # board_covered = 1 - (len(game.get_blank_spaces()) / float(game.height * game.width))
+
+    player_next_moves = sum([game.__get_moves__(move) for move in game.get_legal_moves(player)], [])
+    opponent_next_moves = sum([game.__get_moves__(move) for move in game.get_legal_moves(opponent)], [])
+
+    # player_last_move = game.get_player_location(player)
+    # opponent_last_move = game.get_player_location(player)
+
+    # plm_r, plm_c = player_last_move
+    # olm_r, olm_c = opponent_last_move
+
+    # player_empty_spaces_nearby = sum([(plm_r - i, plm_c - j) in game.get_blank_spaces() for i in [-2, -1, 0, 1, 2] for j in [-2, -1, 0, 1, 2]])
+    # opp_empty_spaces_nearby = sum([(olm_r - i, olm_c - j) in game.get_blank_spaces() for i in [-2, -1, 0, 1, 2] for j in [-2, -1, 0, 1, 2]])
+    # distance_to_opponent = abs(plm_r - olm_r) + abs(plm_c - olm_c)
+    # distance_to_center = sqrt((plm_r-game.height)**2 + (plm_c-game.width)**2)
+
+    #move_diff = num_player_moves - num_opponent_moves
+
+    # return sign(move_diff)*(move_diff)**2 + len(player_next_moves) - len(opponent_next_moves)
+    # return move_diff + sign(move_diff)*max(num_player_moves/num_opponent_moves, num_opponent_moves/num_player_moves) #+ 2*len(player_next_moves)
+    # return move_diff + sign(move_diff) * max(num_player_moves / num_opponent_moves, num_opponent_moves / num_player_moves)*100.0 - distance_to_opponent
+    #calc_1 = ((num_player_moves - num_opponent_moves) / min(num_player_moves, num_opponent_moves))
+
+    return ((len(player_next_moves) - len(opponent_next_moves)))
 
 
 def custom_score(game, player):
@@ -44,11 +126,7 @@ def custom_score(game, player):
     if game.is_winner(player):
         return float("inf")
 
-    own_moves = len(game.get_legal_moves(player))
-    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    if opp_moves == 0:
-        opp_moves=1
-    blank_spaces = len(game.get_blank_spaces())
+
 
     #Heuristic 1
     #return float(own_moves - opp_moves)
@@ -56,8 +134,8 @@ def custom_score(game, player):
     # Heuristic 2
     #return float(own_moves - 2*opp_moves)
     # Heuristic 3
-    return ((own_moves)/opp_moves)
-
+    #return ((own_moves)/opp_moves)
+    return heuristic_4(game, player)
     # Heuristic 4
    # return (math.exp((own_moves) - opp_moves))
 
@@ -160,8 +238,10 @@ class CustomPlayer:
             # pass
             if self.iterative:
                 current_best_move = best_move
-                for i in range(sys.maxsize):
+                i = 0
+                while True:
                     _,best_move = called_method(game,i)
+                    i +=1
             else:
                 _, best_move = called_method(game,self.search_depth)
 
